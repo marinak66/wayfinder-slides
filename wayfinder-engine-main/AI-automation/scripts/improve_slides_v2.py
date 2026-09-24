@@ -48,9 +48,15 @@ CONTENT_TOP = Inches(1.78)
 CONTENT_BOT = Inches(6.55)
 
 # ---------- Fonts ----------
-F_HEAD = "DT Flow Extrabold"
-F_BODY = "DT Flow"
-F_CODE = "Consolas"
+# DT Flow Extrabold — content card headers, labels, callout emphasis
+# DT Flow Heavy     — prominent metric-style labels inside slides
+# DT Flow           — all body text, eyebrow/subheader, captions
+# Consolas          — code blocks
+F_HEAD  = "DT Flow Extrabold"   # card/section headers inside content
+F_HEAVY = "DT Flow Heavy"       # large emphasis labels
+F_BODY  = "DT Flow"             # body text, eyebrow placeholder
+F_CODE  = "Consolas"            # code
+# Title placeholder inherits theme major font — never override with explicit font
 
 
 # ============================================================
@@ -95,11 +101,12 @@ def _update_placeholder(slide, idx, text, size=None, bold=None, color=None, font
                 p = tf.paragraphs[0]
                 r = p.add_run()
                 r.text = text
-                if font:
+                # Never set explicit font on title (idx=0) — let theme major font apply
+                if font and idx != 0:
                     r.font.name = font
                 if size:
                     r.font.size = Pt(size)
-                if bold is not None:
+                if bold is not None and idx != 0:
                     r.font.bold = bold
                 if color:
                     r.font.color.rgb = color
@@ -108,6 +115,28 @@ def _update_placeholder(slide, idx, text, size=None, bold=None, color=None, font
                 return
         except Exception:
             pass
+
+
+def _update_eyebrow(slide, text, color=None, size=None):
+    """Update eyebrow/subheader placeholder — tries idx=14 then idx=1."""
+    for try_idx in (14, 1):
+        for ph in slide.placeholders:
+            try:
+                if ph.placeholder_format.idx == try_idx:
+                    tf = ph.text_frame
+                    tf.clear()
+                    p = tf.paragraphs[0]
+                    r = p.add_run()
+                    r.text = text
+                    r.font.name = F_BODY
+                    if size:
+                        r.font.size = Pt(size)
+                    if color:
+                        r.font.color.rgb = color
+                    return True
+            except Exception:
+                pass
+    return False
 
 
 def _add_textbox(slide, text, left, top, width, height,
@@ -282,8 +311,8 @@ def _card(slide, left, top, width, height, header, body, border_color=TEAL, fill
 
 def rebuild_slide11(slide):
     """pptx slide 12 — How reports become events: identity tuple"""
-    _update_placeholder(slide, 0, "How reports become events: identity tuple", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "One report, one event — or many", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "How reports become events: identity tuple")
+    _update_eyebrow(slide, "One report, one event — or many", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     panel_w = Inches(5.5)
@@ -349,8 +378,8 @@ def rebuild_slide11(slide):
 
 def rebuild_slide12(slide):
     """pptx slide 13 — Match category to condition"""
-    _update_placeholder(slide, 0, "Match the category to the condition", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "event.type is a semantic signal, not a formality", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Match the category to the condition")
+    _update_eyebrow(slide, "event.type is a semantic signal, not a formality", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     # Warning bar
@@ -428,8 +457,8 @@ def rebuild_slide14(slide):
 
 def rebuild_slide15(slide):
     """pptx slide 16 — Correlation rules definition"""
-    _update_placeholder(slide, 0, "Correlation rules — definition and structure", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "Correlation rules explained", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Correlation rules — definition and structure")
+    _update_eyebrow(slide, "Correlation rules explained", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     # Definition bar
@@ -499,8 +528,8 @@ def rebuild_slide16(slide):
 
 def rebuild_slide17(slide):
     """pptx slide 18 — Card A lesson"""
-    _update_placeholder(slide, 0, "Card A lesson — the audit reflex", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "Check what ships before you build", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Card A lesson — the audit reflex")
+    _update_eyebrow(slide, "Check what ships before you build", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     half_w = Inches(5.8)
@@ -534,8 +563,8 @@ def rebuild_slide17(slide):
 
 def rebuild_slide18(slide):
     """pptx slide 19 — Card B lesson"""
-    _update_placeholder(slide, 0, "Card B lesson — the rule that cannot exist", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "You cannot fix improper event design with a correlation rule", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Card B lesson — the rule that cannot exist")
+    _update_eyebrow(slide, "You cannot fix improper event design with a correlation rule", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     half_w = Inches(5.6)
@@ -572,8 +601,8 @@ def rebuild_slide18(slide):
 
 def rebuild_slide19(slide):
     """pptx slide 20 — Card C lesson"""
-    _update_placeholder(slide, 0, "Card C lesson — what the namespace solves", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "The namespace pulls context into the problem", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Card C lesson — what the namespace solves")
+    _update_eyebrow(slide, "The namespace pulls context into the problem", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     # Summary bar
@@ -616,8 +645,8 @@ def rebuild_slide20(slide):
 
 def rebuild_slide22(slide):
     """pptx slide 23 (after deletion of 22 becomes 22) — When RCA is legitimately empty"""
-    _update_placeholder(slide, 0, "When RCA is legitimately empty", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "'No root cause' in a Problem could be expected behaviour", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "When RCA is legitimately empty")
+    _update_eyebrow(slide, "'No root cause' in a Problem could be expected behaviour", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     # Opening bar
@@ -645,8 +674,8 @@ def rebuild_slide22(slide):
 
 def rebuild_slide23(slide):
     """pptx slide 24 — Three dimensions of RCA quality"""
-    _update_placeholder(slide, 0, "Three dimensions of RCA quality", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "Populated RCA is not the same as correct", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Three dimensions of RCA quality")
+    _update_eyebrow(slide, "Populated RCA is not the same as correct", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     bars = [
@@ -677,11 +706,12 @@ def rebuild_slide23(slide):
 
 
 def rebuild_slide24_dql(slide):
-    """pptx slide 25 — Master DQL"""
+    """pptx slide 25 — Master DQL. Screenshot stays on right, DQL on left."""
     _remove_content_shapes(slide, keep_images=True)
     dql = """fetch dt.davis.problems
 | filter not(dt.davis.is_duplicate)
-| filter isNull(root_cause_entity_id) and isNull(root_cause.smartscape_entity.id)
+| filter isNull(root_cause_entity_id)
+    and isNull(root_cause.smartscape_entity.id)
 | fieldsAdd
     affected_count = arraySize(smartscape.affected_entities),
     event_count = arraySize(dt.davis.event_ids),
@@ -690,63 +720,70 @@ def rebuild_slide24_dql(slide):
     matchesPhrase(affected_str, "SERVICE-") or
     matchesPhrase(affected_str, "HOST-") or
     matchesPhrase(affected_str, "PROCESS-")
-| fieldsAdd bucket = if(event_count <= 1, "expected_single_event",
+| fieldsAdd bucket =
+    if(event_count <= 1, "expected_single_event",
     else: if(affected_count == 1, "expected_same_entity",
-    else: if(in("Infrastructure", dt.davis.impact_level) and arraySize(dt.davis.impact_level) == 1, "expected_infra_stack",
+    else: if(in("Infrastructure", dt.davis.impact_level)
+        and arraySize(dt.davis.impact_level) == 1, "expected_infra_stack",
     else: if(event.category == "CUSTOM_ALERT", "review_custom_alert",
-    else: if(affected_count > 0 and not(has_classic), "expected_non_classic_entity",
+    else: if(affected_count > 0 and not(has_classic),
+        "expected_non_classic_entity",
     else: "should_have_had")))))
-| summarize problems = count(), avg_events = round(avg(event_count), decimals: 1), by: {bucket}
+| summarize problems = count(),
+    avg_events = round(avg(event_count), decimals: 1),
+    by: {bucket}
 | sort problems desc"""
-    _simple_code_box(slide, dql, ML, CONTENT_TOP, SW - ML - MR, Inches(4.8), title="Master classification query")
+    _simple_code_box(slide, dql, ML, CONTENT_TOP, Inches(6.2), Inches(4.8), title="Master classification query")
 
 
 def rebuild_slide25_dql(slide):
-    """pptx slide 26 — Case 1 DQL"""
+    """pptx slide 26 — Case 1 DQL on left; screenshot on right."""
     _remove_content_shapes(slide, keep_images=True)
     dql = """fetch dt.davis.problems
 | filter not(dt.davis.is_duplicate)
-| filter isNull(root_cause_entity_id) and isNull(root_cause.smartscape_entity.id)
+| filter isNull(root_cause_entity_id)
+    and isNull(root_cause.smartscape_entity.id)
 | fieldsAdd event_count = arraySize(dt.davis.event_ids)
 | filter event_count <= 1"""
-    _simple_code_box(slide, dql, ML, CONTENT_TOP, Inches(6.5), Inches(1.8), title="Case 1 — expected_single_event")
+    _simple_code_box(slide, dql, ML, CONTENT_TOP, Inches(6.0), Inches(2.0), title="Case 1 — expected_single_event")
 
 
 def rebuild_slide26_dql(slide):
-    """pptx slide 27 — Case 2 DQL"""
+    """pptx slide 27 — Case 2 DQL on left."""
     _remove_content_shapes(slide, keep_images=True)
     dql = """fetch dt.davis.problems
 | filter not(dt.davis.is_duplicate)
-| filter isNull(root_cause_entity_id) and isNull(root_cause.smartscape_entity.id)
+| filter isNull(root_cause_entity_id)
+    and isNull(root_cause.smartscape_entity.id)
 | fieldsAdd
     affected_count = arraySize(smartscape.affected_entities),
     event_count = arraySize(dt.davis.event_ids)
 | filter event_count <= 1
 | filter affected_count == 1"""
-    _simple_code_box(slide, dql, ML, CONTENT_TOP, Inches(6.5), Inches(2.0), title="Case 2 — expected_same_entity")
+    _simple_code_box(slide, dql, ML, CONTENT_TOP, Inches(6.0), Inches(2.2), title="Case 2 — expected_same_entity")
 
 
 def rebuild_slide27_dql(slide):
-    """pptx slide 28 — Case 3 DQL"""
+    """pptx slide 28 — Case 3 DQL on left."""
     _remove_content_shapes(slide, keep_images=True)
     dql = """fetch dt.davis.problems
 | filter not(dt.davis.is_duplicate)
 | filter isNull(root_cause_entity_id)
 | fieldsAdd affected_count = arraySize(smartscape.affected_entities)
 | filter in("Infrastructure", dt.davis.impact_level)
-      and arraySize(dt.davis.impact_level) == 1"""
-    _simple_code_box(slide, dql, ML, CONTENT_TOP, Inches(6.5), Inches(2.0), title="Case 3 — expected_infra_stack")
+    and arraySize(dt.davis.impact_level) == 1"""
+    _simple_code_box(slide, dql, ML, CONTENT_TOP, Inches(6.0), Inches(2.2), title="Case 3 — expected_infra_stack")
 
 
 def rebuild_slide28_dql(slide):
-    """pptx slide 29 — Case 4 + screenshot placeholder"""
+    """pptx slide 29 — Case 4 on left; screenshot stays on right."""
     _remove_content_shapes(slide, keep_images=True)
     dql = """| filter bucket == "should_have_had"
 | filter event_count > 1
 | filter arraySize(dt.davis.impact_level) > 1
 | filter in("Services", dt.davis.impact_level)
-      and in("Infrastructure", dt.davis.impact_level)"""
-    _simple_code_box(slide, dql, ML, CONTENT_TOP, Inches(6.5), Inches(1.9), title="Case 4 — key filter lines (should_have_had)")
+    and in("Infrastructure", dt.davis.impact_level)"""
+    _simple_code_box(slide, dql, ML, CONTENT_TOP, Inches(6.0), Inches(2.0), title="Case 4 — should_have_had key filters")
 
 
 def rebuild_slide29(slide):
@@ -775,8 +812,8 @@ def rebuild_slide29(slide):
 
 def rebuild_slide30(slide):
     """pptx slide 31 — Two tables"""
-    _update_placeholder(slide, 0, "Classification reference + five records", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "The five buckets and five problem records", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Classification reference + five records")
+    _update_eyebrow(slide, "The five buckets and five problem records", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     # Top table — classification reference
@@ -833,8 +870,8 @@ def rebuild_slide30(slide):
 
 def rebuild_slide31(slide):
     """pptx slide 32 — Answer reveal table"""
-    _update_placeholder(slide, 0, "Answer reveal — which problem goes where", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "The answers explained", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Answer reveal — which problem goes where")
+    _update_eyebrow(slide, "The answers explained", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     answers = [
@@ -866,8 +903,8 @@ def rebuild_slide31(slide):
 
 def rebuild_slide32(slide):
     """pptx slide 33 — P-4 guard"""
-    _update_placeholder(slide, 0, "P-4 — the guard", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "What the array-size guard prevents", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "P-4 — the guard")
+    _update_eyebrow(slide, "What the array-size guard prevents", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     half_w = Inches(5.4)
@@ -908,8 +945,8 @@ def rebuild_slide32(slide):
 
 def rebuild_slide33(slide):
     """pptx slide 34 — P-1 two checks"""
-    _update_placeholder(slide, 0, "P-1 — the two checks", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "Custom alert: check the category first, then the reference", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "P-1 — the two checks")
+    _update_eyebrow(slide, "Custom alert: check the category first, then the reference", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     half_w = Inches(5.4)
@@ -1033,8 +1070,8 @@ def insert_tcca_slide(prs, after_idx):
 
 def rebuild_slide35(slide):
     """pptx slide 36 — Honest conversation / Commit to the trend"""
-    _update_placeholder(slide, 0, "Customer conversation and the honest position", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "Commit to the trend, not the number", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Customer conversation and the honest position")
+    _update_eyebrow(slide, "Commit to the trend, not the number", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     left_w = Inches(3.8)
@@ -1090,8 +1127,8 @@ def rebuild_slide35(slide):
 
 def rebuild_slide36(slide):
     """pptx slide 37 — Agentic comparison"""
-    _update_placeholder(slide, 0, "Agentic — two surfaces, shared reasoning, hard rule", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "SRE Agent vs. Assist", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Agentic — two surfaces, shared reasoning, hard rule")
+    _update_eyebrow(slide, "SRE Agent vs. Assist", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     # Rule bar
@@ -1148,8 +1185,8 @@ def rebuild_slide36(slide):
 
 def rebuild_slide37(slide):
     """pptx slide 38 — SRE Agent deployment"""
-    _update_placeholder(slide, 0, "SRE Agent deployment", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "Never run the template as-is", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "SRE Agent deployment")
+    _update_eyebrow(slide, "Never run the template as-is", color=MUTED)
     _remove_content_shapes(slide, keep_images=True)
 
     # Warning bar
@@ -1183,8 +1220,8 @@ def rebuild_slide38(slide):
 
 def rebuild_slide39(slide):
     """pptx slide 40 — SRE Agent on empty RCA"""
-    _update_placeholder(slide, 0, "SRE Agent on an empty root cause", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "Agentic narrative where deterministic correctly has nothing", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "SRE Agent on an empty root cause")
+    _update_eyebrow(slide, "Agentic narrative where deterministic correctly has nothing", color=MUTED)
     _remove_content_shapes(slide, keep_images=True)
 
     bullets_top = CONTENT_TOP
@@ -1203,8 +1240,8 @@ def rebuild_slide39(slide):
 
 def rebuild_slide40(slide):
     """pptx slide 41 — Agentic analysis / auditability"""
-    _update_placeholder(slide, 0, "Agentic Analysis", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "The auditability beat", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Agentic Analysis")
+    _update_eyebrow(slide, "The auditability beat", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     # Big quote
@@ -1234,8 +1271,8 @@ def rebuild_slide40(slide):
 
 def rebuild_slide41(slide):
     """pptx slide 42 — Routing"""
-    _update_placeholder(slide, 0, "Routing — the handoff", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "Where a clean problem goes next", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Routing — the handoff")
+    _update_eyebrow(slide, "Where a clean problem goes next", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     # Schema row
@@ -1266,8 +1303,8 @@ def rebuild_slide41(slide):
 
 def rebuild_slide42(slide):
     """pptx slide 43 — Honest ITSM position + DQL"""
-    _update_placeholder(slide, 0, "The honest ITSM position + DQL", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "What downstream systems can consume today", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "The honest ITSM position + DQL")
+    _update_eyebrow(slide, "What downstream systems can consume today", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     half_w = Inches(5.5)
@@ -1310,8 +1347,8 @@ def rebuild_slide42(slide):
 
 def rebuild_slide43(slide):
     """pptx slide 44 — Governance cycle"""
-    _update_placeholder(slide, 0, "Governance — Wayfinder Stage 9", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "One-off tuning delivers temporary improvement only", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Governance — Wayfinder Stage 9")
+    _update_eyebrow(slide, "One-off tuning delivers temporary improvement only", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     cards = [
@@ -1336,8 +1373,8 @@ def rebuild_slide43(slide):
 
 def rebuild_slide44(slide):
     """pptx slide 45 — Reinforcement Q&A"""
-    _update_placeholder(slide, 0, "Reinforcement", font=F_HEAD, bold=True)
-    _update_placeholder(slide, 1, "Quick recall", font=F_BODY, color=MUTED)
+    _update_placeholder(slide, 0, "Reinforcement")
+    _update_eyebrow(slide, "Quick recall", color=MUTED)
     _remove_content_shapes(slide, keep_images=False)
 
     # Pathway chip
