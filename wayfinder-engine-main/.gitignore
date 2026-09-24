@@ -1,0 +1,50 @@
+# Fetched wayfinder content cache (best-practices/ + public-docs/ per stage)
+# populated on demand by AI-automation/scripts/sync/pull_best_practices.py
+AI-automation/wayfinder-post-process/*
+!AI-automation/wayfinder-post-process/.gitkeep
+
+# Generated training output
+AI-automation/outputs/*
+!AI-automation/outputs/projects/
+AI-automation/outputs/projects/*
+!AI-automation/outputs/projects/*/
+AI-automation/outputs/projects/*/*
+!AI-automation/outputs/projects/*/mapping.md
+!AI-automation/outputs/projects/*/mapping.mmd
+!AI-automation/outputs/projects/*/mapping-simplified.mmd
+!AI-automation/outputs/projects/*/mapping-simplified-practitioner.mmd
+!AI-automation/outputs/stages/
+AI-automation/outputs/stages/*
+!AI-automation/outputs/stages/*/
+AI-automation/outputs/stages/*/*
+!AI-automation/outputs/stages/*/workshop/
+AI-automation/outputs/stages/*/workshop/*
+!AI-automation/outputs/stages/*/workshop/*.response.json
+
+# Environment variables
+.env
+
+# Customer folder
+customer/
+
+CLAUDE.md
+.github/copilot-instructions.md
+
+# Node
+node_modules/
+dist/
+
+# DT app (removed from repo — local dev only)
+Wayfinder-content/github-pages/d1-coe/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+~$*
+AI-automation/.venv/
+AI-automation/.ai/
+AI-automation/outputs/
+AI-automation/pathways-generation/default-pathways/

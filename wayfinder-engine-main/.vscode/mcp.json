@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "dynatrace-mcp-server": {
+      "command": "/opt/homebrew/opt/node@22/bin/npx",
+      "args": ["-y", "@dynatrace-oss/dynatrace-mcp-server@latest"],
+      "env": {
+        "DT_ENVIRONMENT": "https://nwf76222.apps.dynatrace.com",
+        "PATH": "/opt/homebrew/opt/node@22/bin:${env:PATH}"
+      }
+    }
+  }
+}
